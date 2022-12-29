@@ -1,23 +1,21 @@
+import { Fragment } from "react";
+
 function Input(props) {
   return (
-    <div className="flex flex-col space-y-3">
+    <Fragment>
       <label className="font-serif" htmlFor={props.id}>
         {props.children}
       </label>
       <input
-        className={`${
-          props.isValid === true
-            ? "focus:border-green-500 focus:border-x-transparent"
-            : ""
-        }`}
+        className={`${!props.isValid && props.isTouched ? "not-valid" : ""}`}
         type={props.type}
         value={props.value}
         id={props.id}
+        onBlur={props.onBlur}
         onChange={props.onChange}
         placeholder={props.placeholder}
-        name={props.name}
       />
-    </div>
+    </Fragment>
   );
 }
 export default Input;

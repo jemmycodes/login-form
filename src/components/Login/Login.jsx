@@ -1,134 +1,144 @@
+import useForm from "../../hooks/use-form";
 import Input from "../UI/Input";
-import { useReducer, useState, useEffect } from "react";
-import { useContext } from "react";
-import authenticationContext from "../store/authentication-context";
 
-const initState = {
-  firstnameValue: "",
-  firstnameIsValid: false,
-  lastnameValue: "",
-  lastnameIsValid: false,
-  emailValue: "",
-  emailIsValid: false,
-  passwordValue: "",
-  passwordIsValid: false,
-};
+function Login(props) {
+  const [
+    firstName,
+    firstNameTouched,
+    firstNameHandler,
+    firstNameTouchedHandler,
+    resetFirstName,
+    firstNameIsValid,
+    firstNameErrorMessage,
+  ] = useForm(
+    (value) => value.trim() !== "" && value.length >= 3,
+    <p>First Name must be more than 2 letters</p>
+  );
 
-const reducer = (state, action) => {
-  if (action.type === "firstname") {
-    return {
-      ...state,
-      firstnameValue: action.value,
-      firstnameIsValid: state.firstnameValue.trim().length > 2,
-    };
-  } else if (action.type === "lastname") {
-    return {
-      ...state,
-      lastnameValue: action.value,
-      lastnameIsValid: state.lastnameValue.trim().length > 2,
-    };
-  } else if (action.type === "email") {
-    return {
-      ...state,
-      emailValue: action.value,
-      emailIsValid: state.emailValue.includes("@"),
-    };
-  } else if (action.type === "password") {
-    return {
-      ...state,
-      passwordValue: action.value,
-      passwordIsValid: state.passwordValue.trim().length > 6,
-    };
-  }
-  return initState;
-};
+  const [
+    lastName,
+    lastNameTouched,
+    lastNameHandler,
+    lastNameTouchedHandler,
+    resetLastName,
+    lastNameIsValid,
+    lastNameErrorMessage,
+  ] = useForm(
+    (value) => value.trim() !== "" && value.length >= 3,
+    <p>Last Name must be more than 2 letters</p>
+  );
 
-function Login() {
-  const ctx = useContext(authenticationContext);
-  const [formState, dispatchForm] = useReducer(reducer, initState);
-  const [formValid, setFormValid] = useState(false);
+  const [
+    email,
+    emailTouched,
+    emailHandler,
+    emailTouchedHandler,
+    resetEmail,
+    emailIsValid,
+    emailErrorMessage,
+  ] = useForm(
+    (value) => value.trim() !== "" && value.includes("@"),
+    <p>Invalid Email Address</p>
+  );
 
-  useEffect(() => {
-    setFormValid(
-      formState.lastnameIsValid &&
-        formState.firstnameIsValid &&
-        formState.emailIsValid &&
-        formState.passwordIsValid
-    );
-  }, [
-    formState.lastnameIsValid,
-    formState.firstnameIsValid,
-    formState.emailIsValid,
-    formState.passwordIsValid,
-  ]);
+  const [
+    password,
+    passwordTouched,
+    passwordHandler,
+    passwordTouchedHandler,
+    resetPassword,
+    passwordIsValid,
+    passwordErrorMessage,
+  ] = useForm(
+    (value) => value.trim().length > 6,
+    <p>Password must be more than 6 characters</p>
+  );
 
-  const inputHandler = (e) => {
-    dispatchForm({ type: e.target.name, value: e.target.value });
-  };
+  let formIsValid =
+    firstNameIsValid && lastNameIsValid && emailIsValid && passwordIsValid;
 
   const submitFormHandler = (e) => {
     e.preventDefault();
-    if (formValid) {
-      ctx.onLogin(
-        formState.lastnameIsValid,
-        formState.firstnameIsValid,
-        formState.emailIsValid,
-        formState.passwordIsValid
-      );
+    if (!firstNameIsValid) {
+      return;
     }
+
+    props.onLogin({
+      firstName,
+      lastName,
+      email,
+      password,
+    });
+    resetFirstName();
+    resetLastName();
+    resetPassword();
+    resetEmail();
   };
 
   return (
-    <form
-      className="w-80 bg-white p-8 rounded-xl flex flex-col space-y-5  mx-auto"
-      onSubmit={submitFormHandler}
-    >
-      <Input
-        id="first-name"
-        placeholder="First Name"
-        type="text"
-        onChange={inputHandler}
-        name="firstname"
-        isValid={formState.firstnameIsValid}
-      >
-        First Name
-      </Input>
-      <Input
-        id="last-name"
-        placeholder="Last Name"
-        type="text"
-        name="lastname"
-        onChange={inputHandler}
-        isValid={formState.lastnameIsValid}
-      >
-        Last Name
-      </Input>
-      <Input
-        id="email"
-        placeholder="yourname@gmail.com"
-        type="email"
-        onChange={inputHandler}
-        name="email"
-        isValid={formState.emailIsValid}
-      >
-        Email
-      </Input>
-      <Input
-        id="password"
-        type="password"
-        onChange={inputHandler}
-        name="password"
-        isValid={formState.passwordIsValid}
-      >
-        Password
-      </Input>
-
+    <form onSubmit={submitFormHandler}>
+      <div>
+        <Input
+          id="first-name"
+          type="text"
+          placeholder="First Name"
+          value={firstName}
+          onBlur={firstNameTouchedHandler}
+          onChange={firstNameHandler}
+          isValid={firstNameIsValid}
+          isTouched={firstNameTouched}
+        >
+          First Name
+        </Input>
+        {firstNameErrorMessage}
+      </div>
+      <div>
+        <Input
+          id="last-name"
+          placeholder="Last Name"
+          type="text"
+          value={lastName}
+          onBlur={lastNameTouchedHandler}
+          onChange={lastNameHandler}
+          isValid={lastNameIsValid}
+          isTouched={lastNameTouched}
+        >
+          Last Name
+        </Input>
+        {lastNameErrorMessage}
+      </div>
+      <div>
+        <Input
+          id="email"
+          placeholder="yourname@gmail.com"
+          type="email"
+          value={email}
+          onBlur={emailTouchedHandler}
+          onChange={emailHandler}
+          isValid={emailIsValid}
+          isTouched={emailTouched}
+        >
+          Email
+        </Input>
+        {emailErrorMessage}
+      </div>
+      <div>
+        <Input
+          id="password"
+          type="password"
+          value={password}
+          onBlur={passwordTouchedHandler}
+          onChange={passwordHandler}
+          isValid={passwordIsValid}
+          isTouched={passwordTouched}
+        >
+          Password
+        </Input>
+        {passwordErrorMessage}
+      </div>
       <button
-        className={`${
-          formValid === false
-            ? "disabled"
-            : "gradient py-2 px-12 rounded-full text-white font-semibold"
-        }`}
+        className={`${formIsValid ? "valid" : "disabled"}`}
+        disabled={!formIsValid}
       >
         Login
       </button>

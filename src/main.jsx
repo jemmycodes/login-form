@@ -1,13 +1,10 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App";
-import { AuthenticationContext } from "./components/store/authentication-context";
 import "./index.css";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
-    <AuthenticationContext>
-      <App />
-    </AuthenticationContext>
+    <App />
   </React.StrictMode>
 );
